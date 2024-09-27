@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
 
   syslog-gen:
-    image: lscr.io/linuxserver/syslog-ng:latest
+    image: ghcr.io/axoflow/axosyslog:latest
     depends_on:
       haproxy:
         condition: service_started
@@ -55,7 +55,7 @@ services:
         "${MSG_SIZE}",
         "--active-connections",
         "${ACTIVE_CONNECTIONS}",
-        "-i",
+        "${PROTOCOL_PARAM}",
         "-n",
         "${MSG_COUNT}",
         "haproxy",

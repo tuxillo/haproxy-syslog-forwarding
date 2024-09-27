@@ -1,4 +1,4 @@
-targets		= logbackends tcpbackends udpbackends rings
+targets		= tcp.logbackends udp.logbackends tcpbackends rings
 
 clean:
 	@rm -f log-?/*.log || true
