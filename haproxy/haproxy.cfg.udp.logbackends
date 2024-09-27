@@ -1,0 +1,38 @@
+global
+   log stderr format iso local7
+
+defaults
+  log global
+  timeout client 60s
+  timeout connect 60s
+  timeout server 60s
+
+frontend stats
+  mode http
+  bind *:8401
+  stats enable
+  stats uri /stats
+  stats refresh 10s
+  stats admin if LOCALHOST
+
+log-forward syslog
+  # Listen on UDP port 514
+  dgram-bind 0.0.0.0:55514
+  
+  timeout client 60s
+
+  backlog 100
+  maxconn 500
+
+  log backend@syslog-server-1 format raw sample 1:2 local0
+  log backend@syslog-server-2 format raw sample 2:2 local0
+
+backend syslog-server-1
+    mode log
+    balance roundrobin
+    server syslog-ng-1 udp@syslog-server-1:514 check
+
+backend syslog-server-2
+    mode log
+    balance roundrobin
+    server syslog-ng-2 udp@syslog-server-2:514 check
