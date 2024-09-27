@@ -1,0 +1,63 @@
+services:
+  haproxy:
+    image: haproxy
+    ports:
+      - "8401:8401"
+      - "55514:55514"
+    volumes:
+      - ./haproxy/haproxy.cfg${CFG_SPEC}:/usr/local/etc/haproxy/haproxy.cfg
+
+  syslog-server-1:
+    image: ghcr.io/axoflow/axosyslog:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    entrypoint: ["/usr/sbin/syslog-ng", "-F", "-f", "/config/syslog-ng.conf"]
+    volumes:
+      - ./syslog-config:/config
+      - ./log-1:/var/log #optional
+    ports:
+      - 514:514/tcp
+      - 514:514/udp
+    restart: unless-stopped
+
+  syslog-server-2:
+    image: ghcr.io/axoflow/axosyslog:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    entrypoint: ["/usr/sbin/syslog-ng", "-F", "-f", "/config/syslog-ng.conf"]
+    volumes:
+      - ./syslog-config:/config
+      - ./log-2:/var/log #optional
+    ports:
+      - 515:514/tcp
+      - 515:514/udp
+    restart: unless-stopped
+
+  syslog-gen:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    depends_on:
+      haproxy:
+        condition: service_started
+      syslog-server-1:
+        condition: service_healthy
+      syslog-server-2:
+        condition: service_healthy
+    entrypoint:
+      [
+        "loggen",
+        "--rate",
+        "${MSG_RATE}",
+        "-s",
+        "${MSG_SIZE}",
+        "--active-connections",
+        "${ACTIVE_CONNECTIONS}",
+        "-i",
+        "-n",
+        "${MSG_COUNT}",
+        "haproxy",
+        "55514",
+      ]
