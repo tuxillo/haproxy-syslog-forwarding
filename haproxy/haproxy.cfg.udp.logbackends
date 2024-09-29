@@ -30,9 +30,9 @@ log-forward syslog
 backend syslog-server-1
     mode log
     balance roundrobin
-    server syslog-ng-1 udp@syslog-server-1:514 log-bufsize ${LOGBUFSIZE} check
+    server syslog-ng-1 udp@syslog-server-1:514 log-bufsize "${LOGBUFSIZE}" check
 
 backend syslog-server-2
     mode log
     balance roundrobin
-    server syslog-ng-2 udp@syslog-server-2:514 log-bufsize ${LOGBUFSIZE} check
+    server syslog-ng-2 udp@syslog-server-2:514 log-bufsize "${LOGBUFSIZE}" check
