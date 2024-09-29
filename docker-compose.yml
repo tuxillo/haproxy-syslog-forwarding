@@ -1,6 +1,8 @@
 services:
   haproxy:
     image: haproxy
+    environment:
+      - LOGBUFSIZE=${LOGBUFSIZE}
     ports:
       - "8401:8401"
       - "55514:55514"
