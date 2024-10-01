@@ -7,7 +7,7 @@ services:
       - "8401:8401"
       - "55514:55514"
     volumes:
-      - ./haproxy/haproxy.cfg${CFG_SPEC}:/usr/local/etc/haproxy/haproxy.cfg
+      - ./haproxy/haproxy.cfg.${CFG_SPEC}:/usr/local/etc/haproxy/haproxy.cfg
 
   syslog-server-1:
     image: ghcr.io/axoflow/axosyslog:latest
