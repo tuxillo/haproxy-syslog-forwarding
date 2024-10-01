@@ -19,6 +19,8 @@ services:
     volumes:
       - ./syslog-config:/config
       - ./log-1:/var/log #optional
+    healthcheck:
+      interval: 10s
     ports:
       - 514:514/tcp
       - 514:514/udp
@@ -34,6 +36,8 @@ services:
     volumes:
       - ./syslog-config:/config
       - ./log-2:/var/log #optional
+    healthcheck:
+      interval: 10s
     ports:
       - 515:514/tcp
       - 515:514/udp
