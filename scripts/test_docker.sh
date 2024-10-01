@@ -6,6 +6,7 @@
 set -e
 #set -x
 
+DOCKER_COMPOSE="docker compose"
 LOG=$(mktemp)
 TESTS="tcp.logbackends udp.logbackends tcpbackends rings"
 SEP="\t"
@@ -59,10 +60,10 @@ for test in ${TESTS}; do
     envfile=$(generate_env_file ${cfgspec} ${conn} ${bufsize} ${protoparam})
 
     # cleanup previous runs
-    docker compose --env-file "${envfile}" down --remove-orphans >/dev/null 2>&1
+    ${DOCKER_COMPOSE} --env-file "${envfile}" down --remove-orphans >/dev/null 2>&1
 
     # start in the background
-    docker compose --env-file "${envfile}" --progress=plain up -d >/dev/null 2>&1 || true
+    ${DOCKER_COMPOSE} --env-file "${envfile}" --progress=plain up -d >/dev/null 2>&1 || true
 
     # wait until loggen exits
     while [ -z "$(docker ps -q -f status=exited -f name=syslog-gen-1)" ]; do
@@ -70,7 +71,7 @@ for test in ${TESTS}; do
     done
 
     # loggen stats
-    docker compose --env-file "${envfile}" logs syslog-gen | fgrep "average rate" | sed -e 's/,//g' >/tmp/loggen_stats.txt
+    ${DOCKER_COMPOSE} --env-file "${envfile}" logs syslog-gen | fgrep "average rate" | sed -e 's/,//g' >/tmp/loggen_stats.txt
 
     read -r duration msgsec count msgsize bw < <(awk -F "[ =]" '{printf("%s %s %s %s %s\n", $13, $8, $11, $17, $19)}' /tmp/loggen_stats.txt)
 
@@ -93,4 +94,4 @@ for test in ${TESTS}; do
   echo ""
 done
 # Shutdown
-#docker compose down --remove-orphans >/dev/null 2>&1
+#${DOCKER_COMPOSE} down --remove-orphans >/dev/null 2>&1
